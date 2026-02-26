@@ -24,24 +24,20 @@ public class MyModule: Module {
         }
         
         Function("startCounter") { ( callback: JavaScriptFunction<ExpressibleByNilLiteral> ) in
-            class CounterBox {
-                var value = 0
-            }
-            let counterBox = CounterBox()
+            var count = 0
             let queue = DispatchQueue(label: "com.example.timer", qos: .background)
             let timer = DispatchSource.makeTimerSource(queue: queue)
 
             timer.schedule(deadline: .now(), repeating: 1.0)
 
             timer.setEventHandler {
-                counterBox.value += 1
-                print("calling callback: \(counterBox.value)")
+                count += 1
 
                 try? self.appContext?.runtime.schedule {
-                    let _ = try? callback.call(counterBox.value)
+                    let _ = try? callback.call(count)
                 }
 
-                if counterBox.value >= 10 {
+                if count >= 10 {
                     timer.cancel()
                 }
             }
